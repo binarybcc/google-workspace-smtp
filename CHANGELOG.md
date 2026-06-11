@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.1] - 2026-06-11
 
+### Added
+- `uninstall.php` cleanup handler — deleting the plugin now removes its stored
+  settings (including the saved SMTP credentials) from the database instead of
+  leaving the app password behind.
+
 ### Fixed
 - Re-saving the settings page without retyping the App Password no longer
   overwrites the saved password with the masked placeholder (which silently
