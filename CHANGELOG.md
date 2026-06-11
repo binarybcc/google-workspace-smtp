@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-06-11
+
+### Added
+- `uninstall.php` cleanup handler — deleting the plugin now removes its stored
+  settings (including the saved SMTP credentials) from the database instead of
+  leaving the app password behind.
+
+### Fixed
+- Re-saving the settings page without retyping the App Password no longer
+  overwrites the saved password with the masked placeholder (which silently
+  broke SMTP authentication). A blank field or the unchanged mask now preserves
+  the stored password, matching the documented "leave blank to keep existing
+  password" behavior.
+
+### Changed
+- The masked password placeholder is now a single shared constant
+  (`PASSWORD_MASK`) referenced by both the field renderer and the save logic, so
+  the displayed mask and the save-time detection can no longer drift apart.
+
 ## [1.0.0] - 2024-12-29
 
 ### Added
