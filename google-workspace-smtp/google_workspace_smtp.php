@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Google Workspace SMTP
  * Description: Simple SMTP plugin for Google Workspace using app passwords
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Custom Plugin
  * Text Domain: google-workspace-smtp
  */
@@ -13,9 +13,13 @@ if (!defined('ABSPATH')) {
 }
 
 class GoogleWorkspaceSMTP {
-    
+
     private $option_name = 'gws_smtp_settings';
-    
+
+    // Masked value shown in the password field when a password is already saved.
+    // The save logic treats this exact value (or a blank field) as "no change".
+    const PASSWORD_MASK = '••••••••••••••••';
+
     public function __construct() {
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_init', array($this, 'settings_init'));
@@ -80,9 +84,18 @@ class GoogleWorkspaceSMTP {
             $sanitized['smtp_email'] = sanitize_email($input['smtp_email']);
         }
         
-        if (isset($input['smtp_password'])) {
+        // Preserve the stored password when the field is left blank or still shows
+        // the masked placeholder. Without this, re-saving the settings page without
+        // retyping the password would overwrite it with the mask and break SMTP auth.
+        $existing = get_option($this->option_name, array());
+        $existing_password = isset($existing['smtp_password']) ? $existing['smtp_password'] : '';
+        $submitted_password = isset($input['smtp_password']) ? $input['smtp_password'] : '';
+
+        if ($submitted_password === '' || $submitted_password === self::PASSWORD_MASK) {
+            $sanitized['smtp_password'] = $existing_password;
+        } else {
             // Don't sanitize password as it may contain special characters
-            $sanitized['smtp_password'] = $input['smtp_password'];
+            $sanitized['smtp_password'] = $submitted_password;
         }
         
         if (isset($input['from_name'])) {
@@ -111,7 +124,7 @@ class GoogleWorkspaceSMTP {
         ?>
         <input type='password' 
                name='<?php echo esc_attr($this->option_name); ?>[smtp_password]' 
-               value='<?php echo $has_password ? '••••••••••••••••' : ''; ?>' 
+               value='<?php echo $has_password ? esc_attr(self::PASSWORD_MASK) : ''; ?>'
                style='width: 300px;' 
                placeholder="<?php echo $has_password ? __('Password saved', 'google-workspace-smtp') : __('Enter app password', 'google-workspace-smtp'); ?>"
                <?php echo $has_password ? '' : 'required'; ?>>
