@@ -80,10 +80,11 @@ as long as the plugin stays Gmail-specific.
 
 ## 🟢 INFO — Repo hygiene
 
-- `google-workspace-smtp.zip` is committed at the repo root even though `*.zip` is
-  in `.gitignore`. A committed build artifact can drift from the source and be
-  shipped stale. Consider regenerating it from source on release rather than
-  tracking it.
+- `google-workspace-smtp.zip` exists at the repo root as a loose, gitignored
+  build artifact (it is **not** tracked in git). It can still drift from source
+  and be distributed stale, so it should be regenerated from the current code at
+  release time rather than left lying around. (Verified 2026-06-11: never
+  committed to history.)
 - `.DS_Store` is present in the working tree (matched by `.gitignore`, so not
   tracked — just noting it appears locally).
 
